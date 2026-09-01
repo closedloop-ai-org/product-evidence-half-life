@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Product Evidence Half-Life Calculator</title>
+  <meta name="description" content="Estimate when product evidence becomes too old to support a roadmap decision, then build a practical revalidation cadence.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://closedloop-ai-org.github.io/product-evidence-half-life/">
+  <style>
+    :root{color-scheme:light;--ink:#172033;--muted:#5d687a;--line:#dfe5ee;--paper:#fff;--wash:#f4f7fb;--accent:#3157d5;--good:#147a55;--warn:#9a6700;--bad:#b42318}
+    *{box-sizing:border-box}body{margin:0;background:var(--wash);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{max-width:880px;margin:auto;padding:56px 22px 80px}.eyebrow{color:var(--accent);font-size:.78rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+    h1{font-size:clamp(2.2rem,7vw,4.3rem);letter-spacing:-.055em;line-height:1.02;margin:.35rem 0 1.1rem}h2{font-size:1.55rem;line-height:1.2;margin:2.6rem 0 .7rem}h3{font-size:1.05rem;margin:1.4rem 0 .3rem}
+    .lede{font-size:1.2rem;color:var(--muted);max-width:720px}.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 10px 35px rgba(23,32,51,.06);margin:30px 0}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}label{display:block;font-size:.82rem;font-weight:700;margin-bottom:6px}
+    input,select,button{width:100%;border:1px solid #c9d2df;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);font:inherit}
+    button{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:750;cursor:pointer;margin-top:18px}button:hover{filter:brightness(.94)}
+    .result{display:none;margin-top:22px;padding:18px;border-radius:12px;background:#eef2ff;border-left:5px solid var(--accent)}.score{font-size:2.1rem;font-weight:800;letter-spacing:-.04em}
+    .result.good{background:#eaf7f1;border-color:var(--good)}.result.warn{background:#fff7e3;border-color:var(--warn)}.result.bad{background:#fff0ee;border-color:var(--bad)}
+    .steps{counter-reset:item;padding:0}.steps li{list-style:none;position:relative;padding:0 0 20px 46px}.steps li:before{counter-increment:item;content:counter(item);position:absolute;left:0;top:2px;width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#e9edfa;color:var(--accent);font-weight:800}
+    .note{border-left:3px solid #a9b7cf;padding-left:16px;color:var(--muted)}a{color:#2449c4;text-underline-offset:3px}footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;color:var(--muted);font-size:.9rem}
+    @media(max-width:700px){main{padding-top:34px}.grid{grid-template-columns:1fr}.card{padding:18px}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Open decision tool</div>
+    <h1>Product Evidence Half-Life Calculator</h1>
+    <p class="lede">Roadmap evidence does not stay true forever. Estimate how much confidence remains in an old finding, decide whether it is still safe to use, and set a review cadence before a decision quietly drifts away from the market.</p>
+  </header>
+
+  <section class="card" aria-labelledby="calculator-title">
+    <h2 id="calculator-title" style="margin-top:0">Estimate evidence freshness</h2>
+    <p>Use the last date the finding was validated with real customer evidence—not the date it was first written down.</p>
+    <div class="grid">
+      <div><label for="date">Last validated</label><input id="date" type="date"></div>
+      <div><label for="cadence">Normal evidence cadence</label><select id="cadence"><option value="45">Weekly</option><option value="75" selected>Monthly</option><option value="120">Quarterly</option></select></div>
+      <div><label for="change">Market or product change</label><select id="change"><option value="1.3">Low</option><option value="1" selected>Normal</option><option value=".7">High</option></select></div>
+    </div>
+    <button id="calculate" type="button">Calculate freshness</button>
+    <div id="result" class="result" aria-live="polite">
+      <div id="score" class="score"></div>
+      <strong id="status"></strong>
+      <p id="recommendation" style="margin-bottom:0"></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>What “half-life” means here</h2>
+    <p>Evidence half-life is a decision aid, not a scientific constant. It is the point at which an observation should carry roughly half its original confidence because customers, workflows, positioning, pricing, and alternatives may have changed. A recent direct interview about a current workflow can remain useful for months. A second-hand note from before a major product launch may be stale almost immediately.</p>
+    <p>The calculator starts with a simple cadence-based baseline. Teams that collect evidence every week get a shorter default half-life because they can detect change quickly. Quarterly programs receive a longer baseline because they work with a slower review rhythm. The change setting then shortens or lengthens that window. This deliberately favors caution: the cost of a short revalidation check is usually lower than the cost of building against an obsolete assumption.</p>
+
+    <h2>How to use the result</h2>
+    <h3>75–100%: current enough to use</h3>
+    <p>The evidence is recent relative to your operating cadence. It can support prioritization, but it still needs normal checks for sample quality, customer relevance, and contradictory evidence. Freshness does not repair a weak source.</p>
+    <h3>40–74%: use with a revalidation plan</h3>
+    <p>The finding may still be directionally right, but a decision should include a quick confirmation step. Revisit two or three recent conversations, check whether the same friction appears in support or sales material, and record what changed.</p>
+    <h3>Below 40%: treat it as a hypothesis</h3>
+    <p>Do not present the old finding as current fact. Re-open the question, collect recent examples, and look specifically for disconfirming evidence. If the roadmap item is expensive or difficult to reverse, require stronger validation before commitment.</p>
+
+    <h2>A lightweight revalidation workflow</h2>
+    <ol class="steps">
+      <li><strong>Name the exact claim.</strong> Replace broad statements such as “onboarding is confusing” with a testable observation: who struggles, during which task, and what outcome is blocked.</li>
+      <li><strong>Mark the evidence boundary.</strong> Record the customer segment, product version, source dates, number of examples, and whether the evidence was direct or summarized by someone else.</li>
+      <li><strong>Search recent material first.</strong> Review current conversations, tickets, calls, surveys, and win-loss notes for the same behavior. A useful <a href="https://closedloop.sh/customer-feedback-analysis">customer feedback analysis</a> process keeps the source evidence connected to the product decision instead of reducing it to vote counts.</li>
+      <li><strong>Look for contradiction.</strong> Ask what would prove the claim wrong. A newer workflow, changed packaging, a different buyer, or a solved integration gap can invalidate an otherwise well-supported finding.</li>
+      <li><strong>Update confidence visibly.</strong> Write “confirmed,” “narrowed,” “changed,” or “not found” with the review date. Preserve the old record so future readers can see why the decision moved.</li>
+    </ol>
+
+    <h2>Choose the right review cadence</h2>
+    <p>High-change evidence deserves shorter intervals. Review findings sooner when the product area is being redesigned, when a new competitor changes customer expectations, when pricing or packaging moves, or when the evidence comes from prospects rather than active customers. Stable compliance workflows and deeply embedded operational habits may age more slowly, but they should still be checked after major organizational or regulatory change.</p>
+    <p>A practical rule is to attach the next review date when evidence first enters a roadmap document. That is easier than auditing an entire backlog later. For important bets, also assign an owner and a clear trigger—for example, “revalidate after the new admin experience reaches general availability.”</p>
+
+    <h2>Limits of the score</h2>
+    <p>The percentage measures time-based decay only. It does not measure truth, representativeness, commercial value, urgency, or implementation risk. Ten recent comments from the wrong segment can be less useful than two older observations from the customers affected by the decision. Use the score to prompt a review, never to automate a roadmap decision.</p>
+    <p class="note">Keep the date of evidence separate from the date of interpretation. A newly written summary based on year-old conversations still contains year-old evidence.</p>
+  </section>
+
+  <footer>Maintained by ClosedLoop AI as an open practical resource. The method is advisory and intentionally simple.</footer>
+</main>
+<script>
+(function(){
+  var date=document.getElementById("date");
+  date.value=new Date().toISOString().slice(0,10);
+  document.getElementById("calculate").addEventListener("click",function(){
+    var chosen=new Date(date.value+"T12:00:00");
+    if(!date.value||isNaN(chosen.getTime())){date.focus();return}
+    var age=Math.max(0,Math.floor((Date.now()-chosen.getTime())/86400000));
+    var baseline=Number(document.getElementById("cadence").value);
+    var modifier=Number(document.getElementById("change").value);
+    var halfLife=baseline*modifier;
+    var freshness=Math.max(1,Math.round(100*Math.pow(.5,age/halfLife)));
+    var box=document.getElementById("result");
+    var status=document.getElementById("status");
+    var recommendation=document.getElementById("recommendation");
+    document.getElementById("score").textContent=freshness+"% confidence remaining";
+    box.className="result "+(freshness>=75?"good":freshness>=40?"warn":"bad");
+    status.textContent=freshness>=75?"Current enough to use":freshness>=40?"Revalidate before commitment":"Treat as an unconfirmed hypothesis";
+    recommendation.textContent="This evidence is "+age+" days old. Its adjusted half-life is "+Math.round(halfLife)+" days. "+(freshness>=75?"Keep the normal review date and watch for contradictory evidence.":freshness>=40?"Check recent source material and confirm the claim with two or three current examples.":"Do not rely on it for a costly or irreversible decision until it is tested again.");
+    box.style.display="block";
+  });
+})();
+</script>
+</body>
+</html>
